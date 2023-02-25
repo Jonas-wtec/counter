@@ -40,3 +40,43 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+
+# See http://help.github.com/ignore-files/ for more about ignoring files.
+
+# Compiled output
+counter-frontend/dist
+counter-frontend/tmp
+counter-frontend/out-tsc
+counter-frontend/bazel-out
+
+# Node
+counter-frontend/node_modules
+counter-frontend/npm-debug.log
+counter-frontend/yarn-error.log
+
+# Miscellaneous
+counter-frontend/.angular/cache
+
+# System files
+counter-frontend/.DS_Store
+counter-frontend/Thumbs.db
+
+
+# Compiled output
+counter-backend/dist
+counter-backend/tmp
+counter-backend/out-tsc
+counter-backend/bazel-out
+
+# Node
+counter-backend/node_modules
+counter-backend/npm-debug.log
+counter-backend/yarn-error.log
+
+# Miscellaneous
+counter-backend/.angular/cache
+
+# System files
+counter-backend/.DS_Store
+counter-backend/Thumbs.db
