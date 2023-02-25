@@ -1,0 +1,35 @@
+.wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.app {
+    display: block;
+}
+
+.margin > *{
+    margin: 30px;
+}
+
+.circle {
+    display: grid;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #000;
+    height: 30vh;
+    width: 30vh;
+    border-radius: 100%;
+    background-color: #327497;
+}
+
+.scale {
+    transform: scale(0.75);
+    margin: 0 0 35px 4px;
+}
+
+h2 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

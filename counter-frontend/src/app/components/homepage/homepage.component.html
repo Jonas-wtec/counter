@@ -1,0 +1,19 @@
+<div class="app">
+    <h1 class="wrapper">Current Location:</h1>
+    <div class="wrapper">
+        <h2>{{currentLocation}}</h2>
+        <mat-icon class="scale" (click)="openDialog()">edit</mat-icon>
+    </div>
+    <div class="circle">
+        <h2>People</h2>
+        <h2>{{currentCount$ | async}}</h2>
+    </div>
+    <div class="wrapper margin">
+        <button (click)="addCount()" mat-fab>
+            <mat-icon>add</mat-icon>
+        </button>
+        <button (click)="removeCount()" mat-fab>
+            <mat-icon>remove</mat-icon>
+        </button>
+    </div>
+</div>
