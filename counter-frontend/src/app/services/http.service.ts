@@ -5,7 +5,7 @@ import { Subject } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
-export class HttpService implements OnInit{
+export class HttpService{
 
   private database_port = 3000;
   private url: string = `http://192.168.31.80:${this.database_port}/counts`;
@@ -16,9 +16,10 @@ export class HttpService implements OnInit{
 
   constructor(private http: HttpClient) {
     this.currentCount$.subscribe(newNumber => this.changeCount(newNumber));
+    this.getLocations();
   }
 
-  ngOnInit(): void {
+  getLocations(): void {
     console.log("Went into ngOninit")
     this.http.get(this.url).subscribe((res:any) => {
       console.log(res);
