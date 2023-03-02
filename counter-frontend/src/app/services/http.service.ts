@@ -9,7 +9,7 @@ export class HttpService {
 
   private database_port = 3000;
   private url: string = `http://192.168.31.80:${this.database_port}/counts`;
-  private location: undefined;
+  private location: undefined | string;
 
   currentCount$: Subject<number> = new Subject<number>();
 
@@ -18,7 +18,7 @@ export class HttpService {
   }
 
   reqLocationCount(location: string) {
-    //this.location = location;
+    this.location = location;
     this.http.post(this.url, {
       get: "get",
       location: location
