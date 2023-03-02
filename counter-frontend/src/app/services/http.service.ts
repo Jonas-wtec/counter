@@ -1,21 +1,43 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
-export class HttpService {
+export class HttpService implements OnInit{
 
   private database_port = 3000;
   private url: string = `http://192.168.31.80:${this.database_port}/counts`;
   private location: undefined | string;
 
   currentCount$: Subject<number> = new Subject<number>();
+  allLocations$: Subject<string[]> = new Subject<string[]>();
 
   constructor(private http: HttpClient) {
-    this.currentCount$.subscribe(newNumber => this.changeCount(newNumber))
+    this.currentCount$.subscribe(newNumber => this.changeCount(newNumber));
   }
+
+  ngOnInit(): void {
+    this.http.get(this.url).subscribe((res:any) => {
+      if (!res.length) {
+        this.allLocations$.next([]);
+        return
+      }
+      if (!Array.isArray(res)){
+        this.allLocations$.next([]);
+        return
+      }
+      const test = res.map((element: any) => {
+        if (element.hasOwnProperty('location')){
+          return element['location'];
+        }
+      })
+      this.allLocations$.next(test);
+      console.log("allLocations are set to"+ test);
+    })
+  }
+
 
   reqLocationCount(location: string) {
     this.location = location;
