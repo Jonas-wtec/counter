@@ -9,11 +9,9 @@ import { HttpService } from 'src/app/services/http.service';
   templateUrl: './change-location.component.html',
   styleUrls: ['./change-location.component.scss']
 })
-export class ChangeLocationComponent implements OnInit{
-
-  name: string | undefined;
-  myControl = new FormControl('');
-  options: string[] = [''];
+export class ChangeLocationComponent implements OnInit {
+  allLocationFC = new FormControl('');
+  options: string[] | undefined;
   filteredOptions: Observable<string[]> | undefined;
 
   constructor(
@@ -22,11 +20,13 @@ export class ChangeLocationComponent implements OnInit{
   ) { }
 
   ngOnInit(): void {
-    this.filteredOptions = this.myControl.valueChanges.pipe(
-      startWith(''),
-      map(value => this._filter(value || '')),
-    );
-    this.http.allLocations$.subscribe(locations => this.options = locations);
+    this.http.allLocations$.subscribe(locations => {
+      this.options = [...locations];
+      this.filteredOptions = this.allLocationFC.valueChanges.pipe(
+        startWith(''),
+        map(value => this._filter(value || '')),
+      );
+    });
   }
 
   onNoClick(): void {
@@ -34,6 +34,8 @@ export class ChangeLocationComponent implements OnInit{
   }
 
   private _filter(value: string): string[] {
+    if (!this.options) {return []}
+
     const filterValue = value.toLowerCase();
 
     return this.options.filter(option => option.toLowerCase().includes(filterValue));

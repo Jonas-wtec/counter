@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { HttpService } from 'src/app/services/http.service';
 import { ChangeLocationComponent } from '../change-location/change-location.component';
@@ -31,12 +32,12 @@ export class HomepageComponent implements OnInit {
   openDialog(): void {
     const dialogRef = this.dialog.open(ChangeLocationComponent, {disableClose: true});
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result: FormControl) => {
       console.log(`Dialog result: ${result}`);
-      if (!result || typeof result !== "string") { return }
-      localStorage.setItem("currentLocation", result);
-      this.currentLocation = result;
-      this.http.reqLocationCount(result);
+      if (!result.value || typeof result.value !== "string") { return }
+      localStorage.setItem("currentLocation", result.value);
+      this.currentLocation = result.value;
+      this.http.reqLocationCount(result.value);
     });
   }
 

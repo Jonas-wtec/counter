@@ -1,13 +1,9 @@
 <h1 mat-dialog-title>Input Location Name</h1>
 <div mat-dialog-content>
-  <mat-form-field appearance="fill">
-    <mat-label>Location</mat-label>
-    <input matInput [(ngModel)]="name">
-  </mat-form-field>
   <form class="example-form">
     <mat-form-field class="example-full-width" appearance="fill">
-      <mat-label>Number</mat-label>
-      <input type="text" placeholder="Pick one" aria-label="Number" matInput [formControl]="myControl"
+      <mat-label>Location</mat-label>
+      <input type="text" placeholder="Pick one" aria-label="Number" matInput [formControl]="allLocationFC"
         [matAutocomplete]="auto">
       <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
         <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
@@ -18,5 +14,5 @@
   </form>
 </div>
 <div mat-dialog-actions>
-  <button mat-button [mat-dialog-close]="name">Ok</button>
+  <button mat-button [mat-dialog-close]="allLocationFC">Ok</button>
 </div>

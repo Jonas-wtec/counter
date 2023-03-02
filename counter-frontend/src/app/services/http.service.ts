@@ -1,6 +1,6 @@
 import { Injectable, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Subject } from 'rxjs';
+import { ReplaySubject, Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +12,7 @@ export class HttpService{
   private location: undefined | string;
 
   currentCount$: Subject<number> = new Subject<number>();
-  allLocations$: Subject<string[]> = new Subject<string[]>();
+  allLocations$: ReplaySubject<Set<string>> = new ReplaySubject<Set<string>>(1);
 
   constructor(private http: HttpClient) {
     this.currentCount$.subscribe(newNumber => this.changeCount(newNumber));
@@ -20,26 +20,21 @@ export class HttpService{
   }
 
   getLocations(): void {
-    console.log("Went into ngOninit")
     this.http.get(this.url).subscribe((res:any) => {
-      console.log(res);
       if (!res.length) {
-        this.allLocations$.next([]);
-        console.log("Returned [] because of !res.length")
+        this.allLocations$.next(new Set([]));
         return
       }
       if (!Array.isArray(res)){
-        this.allLocations$.next([]);
-        console.log("Returned [] because of no Array")
+        this.allLocations$.next(new Set([]));
         return
       }
-      const test = res.map((element: any) => {
+      const location = new Set(res.map((element: any) => {
         if (element.hasOwnProperty('location')){
           return element['location'];
         }
-      })
-      this.allLocations$.next(test);
-      console.log("allLocations are set to"+ test);
+      }));
+      this.allLocations$.next(location);
     })
   }
 
@@ -59,7 +54,6 @@ export class HttpService{
   }
 
   changeCount(number: number) {
-    console.log("TEGFJHSG")
     if (!this.location) { console.error('this.location is undefined!'); return }
     this.http.post(this.url, { count: number, location: this.location })
       .subscribe((res: any) => {
