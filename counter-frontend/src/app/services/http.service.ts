@@ -19,13 +19,17 @@ export class HttpService implements OnInit{
   }
 
   ngOnInit(): void {
+    console.log("Went into ngOninit")
     this.http.get(this.url).subscribe((res:any) => {
+      console.log(res);
       if (!res.length) {
         this.allLocations$.next([]);
+        console.log("Returned [] because of !res.length")
         return
       }
       if (!Array.isArray(res)){
         this.allLocations$.next([]);
+        console.log("Returned [] because of no Array")
         return
       }
       const test = res.map((element: any) => {
