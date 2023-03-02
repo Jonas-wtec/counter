@@ -1,11 +1,12 @@
 const express = require('express');
 const app = express();
+//const cors = require('cors');
 const mongoose = require('./database/mongoose');
 
 const Count = require('./database/models/count');
 
 //mongoose.connection.dropDatabase();
-
+//app.use(cors());
 app.use(express.json());
 
 app.use((req, res, next) => {

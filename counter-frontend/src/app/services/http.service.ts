@@ -7,7 +7,8 @@ import { Subject } from 'rxjs';
 })
 export class HttpService {
 
-  private url: string = 'http://192.168.31.80/counts'
+  private database_port = 3000;
+  private url: string = `http://192.168.31.81:${this.database_port}/counts`;
   private location: string = '';
 
   currentCount$: Subject<number> = new Subject<number>();
