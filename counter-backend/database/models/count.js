@@ -13,6 +13,6 @@ const CountSchema = new mongoose.Schema({
     }
 });
 
-const List = mongoose.model("List", CountSchema);
+const Count = mongoose.model("Count", CountSchema);
 
-module.exports = List;
+module.exports = Count;

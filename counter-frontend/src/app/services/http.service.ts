@@ -7,12 +7,15 @@ import { BehaviorSubject, ReplaySubject } from 'rxjs';
 })
 export class HttpService{
 
-  private database_port = 3000;
-  private url: string = `http://192.168.31.80:${this.database_port}/counts`;
+  private databasePort = 3000;
+  private countEndpoint = '/counts'
+  private locationsEndpoint= '/locations'
+  private cUrl: string = `http://192.168.31.80:${this.databasePort}${this.countEndpoint}`;
+  private lUrl: string = `http://192.168.31.80:${this.databasePort}${this.locationsEndpoint}`;
   private location: undefined | string;
 
   currentCount$: BehaviorSubject<number> = new BehaviorSubject<number>(0);
-  allLocations$: ReplaySubject<Set<string>> = new ReplaySubject<Set<string>>(1);
+  allLocations$: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
 
   constructor(private http: HttpClient) {
     this.currentCount$.subscribe(newNumber => this.changeCount(newNumber));
@@ -20,28 +23,28 @@ export class HttpService{
   }
 
   getLocations(): void {
-    this.http.get(this.url).subscribe((res:any) => {
+    this.http.get(this.lUrl).subscribe((res:any) => {
       if (!res.length) {
-        this.allLocations$.next(new Set([]));
+        this.allLocations$.next([]);
         return
       }
       if (!Array.isArray(res)){
-        this.allLocations$.next(new Set([]));
+        this.allLocations$.next([]);
         return
       }
-      const location = new Set(res.map((element: any) => {
+      const locations = res.map((element: any) => {
         if (element.hasOwnProperty('location')){
           return element['location'];
         }
-      }));
-      this.allLocations$.next(location);
+      });
+      this.allLocations$.next(locations);
     })
   }
 
 
   reqLocationCount(location: string) {
     this.location = location;
-    this.http.post(this.url, {
+    this.http.post(this.cUrl, {
       get: "get",
       location: location
     }).subscribe((res: any) => {
@@ -55,7 +58,7 @@ export class HttpService{
 
   changeCount(number: number) {
     if (!this.location) { console.error('this.location is undefined!'); return }
-    this.http.post(this.url, { count: number, location: this.location })
+    this.http.post(this.cUrl, { count: number, location: this.location })
       .subscribe((res: any) => {
         if (res.length) {
           this.currentCount$.next(res[0].count);
