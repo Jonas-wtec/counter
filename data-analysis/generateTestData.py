@@ -2,6 +2,7 @@ import urllib.request
 import json
 import csv
 import time
+import datetime
 
 with urllib.request.urlopen("http://192.168.31.80:3000/counts") as url:
     data = json.loads(s=url.read())
@@ -11,6 +12,8 @@ with urllib.request.urlopen("http://192.168.31.80:3000/locations") as url:
     locations_formatted = [x['location'] for x in locations]
 
 locationToBeAnalyzed = input(f'Please select location indices to be analyzed (Press enter for all locations): {locations_formatted} ')
+
+print (locations[0])
 
 try:
     intLocationToBeAnalyzed = int(locationToBeAnalyzed)

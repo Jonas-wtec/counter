@@ -80,3 +80,6 @@ counter-backend/.angular/cache
 # System files
 counter-backend/.DS_Store
 counter-backend/Thumbs.db
+
+# output.csv from Data Analysis
+data-analysis/*.csv
