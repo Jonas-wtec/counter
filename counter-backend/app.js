@@ -8,6 +8,7 @@ const Locations = require('./database/models/location');
 //mongoose.connection.dropDatabase();
 app.use(express.json());
 
+//Set CORS Headers for communication on the same serve
 app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Methods", "GET, POST, HEAD, OPTIONS, PUT, PATCH, DELETE");
@@ -15,18 +16,21 @@ app.use((req, res, next) => {
     next();
 });
 
+//Searching for all count data in the database
 app.get("/counts", (req, res) => {
     Count.find({})
         .then(counts => res.send(counts))
         .catch((error) => console.log(error))
 });
 
+//Searching for all location data in the database
 app.get("/locations", (req, res) => {
     Locations.find({})
         .then(locations => res.send(locations))
         .catch((error) => console.log(error))
 });
 
+//Handling new count data. If the location of the count is new a new location will be created as well
 app.post('/counts', (req, res) => {
     if (req.body.get) {
         (Count.find({ location: req.body.location }).sort({ _id: -1 }).limit(1))
@@ -48,6 +52,7 @@ app.post('/counts', (req, res) => {
         .catch((error) => console.log(error))
 });
 
+//Deleting specific counts
 app.delete('/counts/:countId', (req, res) => {
     const deleteTasks = (count) => {
         Count.deleteMany({ _countId: count._id })
@@ -59,4 +64,5 @@ app.delete('/counts/:countId', (req, res) => {
         .catch((error) => console.log(error))
 });
 
+//Configure app to listen on port 3000
 app.listen(3000, () => console.log("Server Connected on port 3000"));
