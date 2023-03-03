@@ -10,8 +10,15 @@ with urllib.request.urlopen("http://192.168.31.80:3000/locations") as url:
     locations = json.loads(s=url.read())
     locations_formatted = [x['location'] for x in locations]
 
-locationToBeAnalyzed = int(input(f'Please select Location indices to be analyzed: {locations_formatted} '))
-output_dict = [x for x in data if 'location' in x and x['location'] == locations_formatted[locationToBeAnalyzed]]
+locationToBeAnalyzed = input(f'Please select location indices to be analyzed (Press enter for all locations): {locations_formatted} ')
+
+try:
+    intLocationToBeAnalyzed = int(locationToBeAnalyzed)
+    print(f'Generating output file for location "{locations_formatted[intLocationToBeAnalyzed]}"')
+    output_dict = [x for x in data if 'location' in x and x['location'] == locations_formatted[intLocationToBeAnalyzed]]
+except:
+    print(f'Generating output file for all locations')
+    output_dict = [x for x in data if 'location' in x]
 
 with open(f'{str(time.time()).replace(".","_")}_output.csv', "w", newline="") as f: 
     title = "time,count,location,_id,__v".split(",")  
