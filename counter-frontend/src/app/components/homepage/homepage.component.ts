@@ -28,9 +28,10 @@ export class HomepageComponent implements OnInit {
     }
   }
   openDialog(): void {
-    const dialogRef = this.dialog.open(ChangeLocationComponent, {disableClose: true});
+    const dialogRef = this.dialog.open(ChangeLocationComponent);
 
-    dialogRef.afterClosed().subscribe((result: FormControl) => {
+    dialogRef.afterClosed().subscribe((result: FormControl | undefined) => {
+      if (!result) {return}
       console.log(`Dialog result: ${result}`);
       if (!result.value || typeof result.value !== "string") { return }
       localStorage.setItem("currentLocation", result.value);
