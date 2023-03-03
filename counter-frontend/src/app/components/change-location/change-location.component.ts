@@ -29,10 +29,6 @@ export class ChangeLocationComponent implements OnInit {
     });
   }
 
-  onNoClick(): void {
-    this.dialogRef.close();
-  }
-
   private _filter(value: string): string[] {
     if (!this.options) {return []}
 
