@@ -1,6 +1,6 @@
 import { Injectable, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { ReplaySubject, Subject } from 'rxjs';
+import { BehaviorSubject, ReplaySubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +11,7 @@ export class HttpService{
   private url: string = `http://192.168.31.80:${this.database_port}/counts`;
   private location: undefined | string;
 
-  currentCount$: Subject<number> = new Subject<number>();
+  currentCount$: BehaviorSubject<number> = new BehaviorSubject<number>(0);
   allLocations$: ReplaySubject<Set<string>> = new ReplaySubject<Set<string>>(1);
 
   constructor(private http: HttpClient) {

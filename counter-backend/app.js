@@ -14,11 +14,6 @@ app.use((req, res, next) => {
     next();
 });
 
-/* 
-List: Create, Update, RedOne, ReadAll, Delete
-Task: See above
-*/
-
 app.get("/counts", (req, res) => {
     Count.find({})
         .then(counts => res.send(counts))

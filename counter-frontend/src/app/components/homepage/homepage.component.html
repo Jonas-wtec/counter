@@ -1,18 +1,23 @@
 <div class="app">
+    <button mat-icon-button class="settings-button" aria-label="Settings menu" (click)="openDialog()">
+        <mat-icon>settings</mat-icon>
+    </button>
     <h1 class="wrapper">Current Location:</h1>
     <div class="wrapper">
         <h2>{{currentLocation}}</h2>
-        <mat-icon class="scale" (click)="openDialog()">edit</mat-icon>
     </div>
     <div class="circle">
-        <h2>People</h2>
-        <h2>{{currentCount$ | async}}</h2>
+        <div *ngIf="currentLocation; else emptyMsg">
+            <h2 id="huge">{{currentCount$ | async}}</h2>
+            <h2 id="abs">people</h2>
+        </div>
+        <ng-template #emptyMsg>Couldn't reach database</ng-template>
     </div>
     <div class="wrapper margin">
         <button (click)="addCount()" mat-fab>
             <mat-icon>add</mat-icon>
         </button>
-        <button (click)="removeCount()" mat-fab>
+        <button (click)="removeCount()" mat-fab >
             <mat-icon>remove</mat-icon>
         </button>
     </div>

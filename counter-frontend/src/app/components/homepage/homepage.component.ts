@@ -14,10 +14,8 @@ export class HomepageComponent implements OnInit {
   currentLocation: string | undefined;
 
   currentCount$ = this.http.currentCount$;
-  currentCount: number = 0;
 
   constructor(public dialog: MatDialog, private http: HttpService) {
-    this.currentCount$.subscribe(num => this.currentCount = num);
   }
 
   ngOnInit(): void {
@@ -42,12 +40,12 @@ export class HomepageComponent implements OnInit {
   }
 
   addCount(){
-    this.currentCount$.next(this.currentCount + 1);
+    this.currentCount$.next(this.currentCount$.getValue()+1);
   }
 
   removeCount(){
-    if(this.currentCount === 0) {return}
-    this.currentCount$.next(this.currentCount - 1);
+    if(this.currentCount$.getValue() === 0) {return}
+    this.currentCount$.next(this.currentCount$.getValue() - 1);
   }
 
 }
