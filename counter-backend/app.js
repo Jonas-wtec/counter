@@ -5,7 +5,7 @@ const mongoose = require('./database/mongoose');
 const Count = require('./database/models/count');
 const Locations = require('./database/models/location');
 
-mongoose.connection.dropDatabase();
+//mongoose.connection.dropDatabase();
 app.use(express.json());
 
 app.use((req, res, next) => {
