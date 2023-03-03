@@ -21,7 +21,7 @@ export class ChangeLocationComponent implements OnInit {
 
   ngOnInit(): void {
     this.http.allLocations$.subscribe(locations => {
-      this.options = [...locations];
+      this.options = locations;
       this.filteredOptions = this.allLocationFC.valueChanges.pipe(
         startWith(''),
         map(value => this._filter(value || '')),

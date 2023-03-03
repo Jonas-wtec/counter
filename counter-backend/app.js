@@ -3,8 +3,9 @@ const app = express();
 const mongoose = require('./database/mongoose');
 
 const Count = require('./database/models/count');
+const Locations = require('./database/models/location');
 
-//mongoose.connection.dropDatabase();
+mongoose.connection.dropDatabase();
 app.use(express.json());
 
 app.use((req, res, next) => {
@@ -20,14 +21,28 @@ app.get("/counts", (req, res) => {
         .catch((error) => console.log(error))
 });
 
+app.get("/locations", (req, res) => {
+    Locations.find({})
+        .then(locations => res.send(locations))
+        .catch((error) => console.log(error))
+});
+
 app.post('/counts', (req, res) => {
     if (req.body.get) {
-        (Count.find({location:req.body.location}).sort({ _id: -1 }).limit(1))
+        (Count.find({ location: req.body.location }).sort({ _id: -1 }).limit(1))
             .then((count) => res.send(count))
             .catch((error) => console.log(error));
         return
     }
-    (new Count({ 'count': req.body.count, 'location':req.body.location }))
+    (Locations.find({ 'location': req.body.location }))
+        .then(location => {
+            if (location.length) { return }
+            (new Locations({ 'location': req.body.location }))
+                .save()
+                .catch((error) => console.log(error))
+        })
+        .catch(error => console.log(error));
+    (new Count({ 'count': req.body.count, 'location': req.body.location }))
         .save()
         .then((count) => res.send(count))
         .catch((error) => console.log(error))
