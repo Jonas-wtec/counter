@@ -2,32 +2,39 @@ import urllib.request
 import json
 import csv
 import time
-import datetime
+from dateutil import parser
 
-with urllib.request.urlopen("http://192.168.31.80:3000/counts") as url:
-    data = json.loads(s=url.read())
+def downloadData(endpoint):
+    with urllib.request.urlopen(f'http://192.168.31.80:3000/{endpoint}') as url:
+        return json.loads(s=url.read())
 
-with urllib.request.urlopen("http://192.168.31.80:3000/locations") as url:
-    locations = json.loads(s=url.read())
-    locations_formatted = [x['location'] for x in locations]
+# Download counts from all locations into variable data
+dataRaw = downloadData('counts')
 
-locationToBeAnalyzed = input(f'Please select location indices to be analyzed (Press enter for all locations): {locations_formatted} ')
+# Download location list into variable locations
+locationsRaw = downloadData('locations')
+locations = [x['location'] for x in locationsRaw]
 
-print (locations[0])
-
+# Request user input on which Location(s) should be inspected
+idxLocation = input(f'Please select location index to be analyzed (Press enter for all locations): {locations} ')
 try:
-    intLocationToBeAnalyzed = int(locationToBeAnalyzed)
-    print(f'Generating output file for location "{locations_formatted[intLocationToBeAnalyzed]}"')
-    output_dict = [x for x in data if 'location' in x and x['location'] == locations_formatted[intLocationToBeAnalyzed]]
+    idxLocation = int(idxLocation)
+    print(f'Generating output file for location "{locations[idxLocation]}"')
+    data = [x for x in dataRaw if 'location' in x and x['location'] == locations[idxLocation]]
 except:
     print(f'Generating output file for all locations')
-    output_dict = [x for x in data if 'location' in x]
+    data = [x for x in dataRaw if 'location' in x]
 
+# Add unix timestamp to data dump
+outputData = [dict(item, unix=time.mktime(parser.parse(item['time']).timetuple())) for item in data]
+
+# Write location(s) count data to csv file
 with open(f'{str(time.time()).replace(".","_")}_output.csv', "w", newline="") as f: 
-    title = "time,count,location,_id,__v".split(",")  
+    title = "unix,time,count,location,_id,__v".split(",")  
     cw = csv.DictWriter(f, title, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
     cw.writeheader()
-    cw.writerows(output_dict)
+    cw.writerows(outputData)
 
-# printing result
-# print("The filtered dictionary value is : " + str(output_dict))
+""" print(data[0]['time'])
+print(parser.parse(data[0]['time']))
+print(time.mktime(parser.parse(data[0]['time']).timetuple())) """
