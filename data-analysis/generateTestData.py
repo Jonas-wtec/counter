@@ -1,6 +1,7 @@
 import urllib.request
 import json
 import csv
+import time
 
 with urllib.request.urlopen("http://192.168.31.80:3000/counts") as url:
     data = json.loads(s=url.read())
@@ -12,7 +13,7 @@ with urllib.request.urlopen("http://192.168.31.80:3000/locations") as url:
 locationToBeAnalyzed = int(input(f'Please select Location indices to be analyzed: {locations_formatted} '))
 output_dict = [x for x in data if 'location' in x and x['location'] == locations_formatted[locationToBeAnalyzed]]
 
-with open("output.csv", "w", newline="") as f: 
+with open(f'{str(time.time()).replace(".","_")}_output.csv', "w", newline="") as f: 
     title = "time,count,location,_id,__v".split(",")  
     cw = csv.DictWriter(f, title, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
     cw.writeheader()
