@@ -18,8 +18,9 @@ app.use((req, res, next) => {
     next();
 });
 
-// This is the high-level overview List that must be kept synchronized at all times!
-const observedLocations = []
+// This is the high-level overview Set that must be kept synchronized at all times!
+const observedLocations = new Set();
+const observedFixtures = [];
 
 
 smartdirector.apiReq('192.168.5.1', 'admin:FiatLux007', 'subscribe', {}, 443)
@@ -29,7 +30,6 @@ smartdirector.apiReq('192.168.5.1', 'admin:FiatLux007', 'subscribe', {}, 443)
 
         // Synchronize data between smartdirector/app.js/db
         clusterData.responseData.location.forEach(location => {
-            console.log(location.name + " and " + location?.childFixture);
             Locations.find({})
                 .then(dbLocations => {
                     if (dbLocations.some(dbLocationObject => dbLocationObject.location === location.name)) {
@@ -48,7 +48,14 @@ smartdirector.apiReq('192.168.5.1', 'admin:FiatLux007', 'subscribe', {}, 443)
     .on('data', rawClusterData => {
         const clusterData = JSON.parse(rawClusterData).responseData;
         //console.log(clusterData);
-        // Generel idea: go through list observedLocations and look up respective fixtures in db -> save any matches under /smartdirector
+        //General idea: Check if any new motionData is reported in clusterData. If yes, check if that motionData is within our observedFixtures. If yes, add motion to /motions
+        if (!clusterData.hasOwnProperty('fixture') || !clusterData.fixture.some(oneFixture => oneFixture.sensorStats.hasOwnProperty('motion') )) { return; }
+        console.log("Motion update");
+        // Check if motionData is within observedFixtures
+        if (clusterData.fixture.some(oneFixture => observedFixtures.some(oFixtures => oneFixture === oFixtures))){
+            console.log("Überschneidung!")
+        }
+
     })
     .on('error', (e => console.log(e)))
     .on('end', (end => console.log(end)));
@@ -71,15 +78,23 @@ app.get("/locations", (req, res) => {
 
 //Handling new count data.
 app.post('/counts', (req, res) => {
-    (Locations.find({ 'location': req.body.location }))
+    (Locations.findOne({ 'location': req.body.location }))
         .then(location => {
-            if (!location.length) { console.error("Count tried for location " + req.body.location + " which doesn't exist in the db"); return }
+            if (!location) { console.error("Count tried for location " + req.body.location + " which doesn't exist in the db"); return }
             if (req.body.get) {
-                console.log("Trying to get count of location");
                 (Count.find({ location: req.body.location }).sort({ _id: -1 }).limit(1))
                     .then((count) => {
                         // Sending count of location and adding location to observable list.
                         res.send(count);
+                        // Check if size of Set increases and if yes call update observedFixtures subroutine
+                        const tempSize = observedLocations.size;
+                        observedLocations.add(req.body.location);
+                        if (tempSize === observedLocations.size) { return }
+                        console.log("Added location " + req.body.location + " to observed locations");
+                        //Add location childFixtures to observedFixtures, if childFixtures exist
+                        if (!location.childFixture.length) { return; }
+                        observedFixtures.push(location.childFixture);
+                        console.log("Added childFixtures to observedFixtures " + observedFixtures);
                     })
                     .catch((error) => console.log(error));
                 return
