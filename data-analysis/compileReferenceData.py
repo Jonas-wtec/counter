@@ -15,25 +15,42 @@ dataRaw = downloadData('counts')
 locationsRaw = downloadData('locations')
 locations = [x['location'] for x in locationsRaw]
 
+# Download motionTicks from all locations into motionTickRaw
+motionTicksRaw = downloadData('motionTicks')
+
 # Request user input on which Location(s) should be inspected
 idxLocation = input(f'Please select location index to be analyzed (Press enter for all locations): {locations} ')
 try:
     idxLocation = int(idxLocation)
     print(f'Generating output file for location "{locations[idxLocation]}"')
     data = [x for x in dataRaw if 'location' in x and x['location'] == locations[idxLocation]]
+    motionTicks = [x for x in motionTicksRaw if 'location' in x and x['location'] == locations[idxLocation]]
 except:
     print(f'Generating output file for all locations')
     data = [x for x in dataRaw if 'location' in x]
+    motionTicks = motionTicksRaw
 
 # Add unix timestamp to data dump
 outputData = [dict(item, unix=time.mktime(parser.parse(item['time']).timetuple())) for item in data]
+outputMotionTicks = [dict(item, unix=time.mktime(parser.parse(item['time']).timetuple())) for item in motionTicks]
 
 # Write location(s) count data to csv file
-with open(f'{str(time.time()).replace(".","_")}_output.csv', "w", newline="") as f: 
+with open(f'output_count_{str(time.time()).replace(".","_")}.csv', "w", newline="") as f: 
     title = "unix,time,count,location,_id,__v".split(",")  
     cw = csv.DictWriter(f, title, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
     cw.writeheader()
     cw.writerows(outputData)
+
+
+# Write location(s) motionRaw data to csv file
+with open(f'output_motionTicks_{str(time.time()).replace(".","_")}.csv', "w", newline="") as f: 
+    title = "unix,time,serialNum,location,_id,__v".split(",")  
+    cw = csv.DictWriter(f, title, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+    cw.writeheader()
+    cw.writerows(outputMotionTicks)
+
+
+
 
 """ print(data[0]['time'])
 print(parser.parse(data[0]['time']))
