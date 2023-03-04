@@ -3,6 +3,9 @@ const mongoose = require('mongoose');
 const CountSchema = new mongoose.Schema({
     location: {
         type: String
+    },
+    childFixture: {
+        type: Array
     }
 });
 

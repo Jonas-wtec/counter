@@ -7,7 +7,7 @@ const Locations = require('./database/models/location');
 
 const smartdirector = require('./webService/smartdirector');
 
-//mongoose.connection.dropDatabase();
+mongoose.connection.dropDatabase();
 app.use(express.json());
 
 //Set CORS Headers for communication on the same serve
@@ -29,15 +29,16 @@ smartdirector.apiReq('192.168.5.1', 'admin:FiatLux007', 'subscribe', { }, 443)
 
         // Synchronize data between smartdirector/app.js/db
         clusterData.responseData.location.forEach(location => {
+            console.log(location.name +" and "+ location?.childFixture);
             Locations.find({})
                 .then(dbLocations => {
                     if (dbLocations.some(dbLocationObject => dbLocationObject.location === location.name)) {
                         console.log("Location " + location.name + " already exists in db! Skipping...")
                         return;
                     }
-                    (new Locations({ 'location': location.name }))
+                    (new Locations({ 'location': location.name, 'childFixture': location?.childFixture }))
                         .save()
-                        .then(() => console.log("Save location " + location.name + " in db"))
+                        .then(() => console.log("Saved location and respective fixtures" + location.name + " in db"))
                         .catch((error) => console.log(error))
                 })
                 .catch(e => console.log(e))
@@ -67,12 +68,12 @@ app.get("/locations", (req, res) => {
         .catch((error) => console.log(error))
 });
 
-//Handling new count data. If the location of the count is new a new location will be created as well
+//Handling new count data. If the location of the count is new, a new location will be created as well
 app.post('/counts', (req, res) => {
     if (req.body.get) {
         (Count.find({ location: req.body.location }).sort({ _id: -1 }).limit(1))
             .then((count) => {
-                console.log("In Here")
+                // Sending count of location and adding location to observable list.
                 res.send(count);
             })
             .catch((error) => console.log(error));
