@@ -5,7 +5,7 @@ const CountSchema = new mongoose.Schema({
         type: String
     },
     childFixture: {
-        type: Array
+        type: [String]
     }
 });
 

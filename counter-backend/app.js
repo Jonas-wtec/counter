@@ -4,10 +4,11 @@ const app = express();
 const mongoose = require('./database/mongoose');
 const Count = require('./database/models/count');
 const Locations = require('./database/models/location');
+const MotionTick = require('./database/models/motionTick');
 
 const smartdirector = require('./webService/smartdirector');
 
-mongoose.connection.dropDatabase();
+//mongoose.connection.dropDatabase();
 app.use(express.json());
 
 //Set CORS Headers for communication on the same serve
@@ -46,15 +47,24 @@ smartdirector.apiReq('192.168.5.1', 'admin:FiatLux007', 'subscribe', {}, 443)
     }))
     .on('data', rawClusterData => {
         const clusterData = JSON.parse(rawClusterData).responseData;
-        //console.log(clusterData);
         //General idea: Check if any new motionData is reported in clusterData. If yes, check if that motionData is within our observedFixtures. If yes, add motion to /motions
         if (!clusterData.hasOwnProperty('fixture') || !clusterData.fixture.some(oneFixture => oneFixture.sensorStats.hasOwnProperty('motion'))) { return; }
-        console.log("Motion update");
         // Check if motionData is within observedFixtures
         if (!clusterData.fixture.some(oneFixture => observedFixtures.some(oFixtures => `/fixture/${oneFixture.serialNum}` === oFixtures))) { return; }
-        console.log("Überschneidung!")
         clusterData.fixture.forEach(oneFixture => {
-            
+            if (!oneFixture.sensorStats.hasOwnProperty('motion')) { return; }
+            if (!observedFixtures.some(oFixtures => `/fixture/${oneFixture.serialNum}` === oFixtures)) { return; }
+            console.log("OneFixture is" + oneFixture.serialNum)
+            Locations.findOne({ childFixture: `/fixture/${oneFixture.serialNum}` })
+                .then((location) => {
+                    console.log(location.location);
+                    console.log(oneFixture.serialNum);
+                    console.log(oneFixture.sensorStats.motion.instant);
+                    (new MotionTick({'location': location.location, 'serialNum': oneFixture.serialNum, 'time':oneFixture.sensorStats.motion.instant}))
+                        .save()
+                        .then()
+                        .catch(e => console.error(e));
+                })
         })
     })
     .on('error', (e => console.error(e)))
@@ -75,6 +85,13 @@ app.get("/counts", (req, res) => {
 //Searching for all location data in the database
 app.get("/locations", (req, res) => {
     Locations.find({})
+        .then(locations => res.send(locations))
+        .catch((error) => console.log(error))
+});
+
+//Searching for all motionTick data in the database
+app.get("/motionTicks", (req, res) => {
+    MotionTick.find({})
         .then(locations => res.send(locations))
         .catch((error) => console.log(error))
 });
