@@ -22,14 +22,14 @@ app.use((req, res, next) => {
 const observedLocations = []
 
 
-smartdirector.apiReq('192.168.5.1', 'admin:FiatLux007', 'subscribe', { }, 443)
+smartdirector.apiReq('192.168.5.1', 'admin:FiatLux007', 'subscribe', {}, 443)
     .once('data', (rawClusterData => {
 
         const clusterData = JSON.parse(rawClusterData);
 
         // Synchronize data between smartdirector/app.js/db
         clusterData.responseData.location.forEach(location => {
-            console.log(location.name +" and "+ location?.childFixture);
+            console.log(location.name + " and " + location?.childFixture);
             Locations.find({})
                 .then(dbLocations => {
                     if (dbLocations.some(dbLocationObject => dbLocationObject.location === location.name)) {
@@ -45,9 +45,10 @@ smartdirector.apiReq('192.168.5.1', 'admin:FiatLux007', 'subscribe', { }, 443)
         });
 
     }))
-    .on('data', data => {
-        const t = data;
-        // Generel idea: 
+    .on('data', rawClusterData => {
+        const clusterData = JSON.parse(rawClusterData).responseData;
+        //console.log(clusterData);
+        // Generel idea: go through list observedLocations and look up respective fixtures in db -> save any matches under /smartdirector
     })
     .on('error', (e => console.log(e)))
     .on('end', (end => console.log(end)));
@@ -68,27 +69,26 @@ app.get("/locations", (req, res) => {
         .catch((error) => console.log(error))
 });
 
-//Handling new count data. If the location of the count is new, a new location will be created as well
+//Handling new count data.
 app.post('/counts', (req, res) => {
-    if (req.body.get) {
-        (Count.find({ location: req.body.location }).sort({ _id: -1 }).limit(1))
-            .then((count) => {
-                // Sending count of location and adding location to observable list.
-                res.send(count);
-            })
-            .catch((error) => console.log(error));
-        return
-    }
     (Locations.find({ 'location': req.body.location }))
         .then(location => {
-            if (!location.length) { console.error("Count tried for location " + req.body.location + "which doesn't exist in the db"); return }
+            if (!location.length) { console.error("Count tried for location " + req.body.location + " which doesn't exist in the db"); return }
+            if (req.body.get) {
+                console.log("Trying to get count of location");
+                (Count.find({ location: req.body.location }).sort({ _id: -1 }).limit(1))
+                    .then((count) => {
+                        // Sending count of location and adding location to observable list.
+                        res.send(count);
+                    })
+                    .catch((error) => console.log(error));
+                return
+            }
             (new Count({ 'count': req.body.count, 'location': req.body.location }))
                 .save()
                 .then((count) => res.send(count))
                 .catch((error) => console.log(error))
         })
-        .catch(error => console.log(error));
-
 });
 
 //Deleting specific counts
