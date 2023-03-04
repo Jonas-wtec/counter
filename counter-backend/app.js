@@ -7,7 +7,7 @@ const Locations = require('./database/models/location');
 
 const smartdirector = require('./webService/smartdirector');
 
-mongoose.connection.dropDatabase();
+//mongoose.connection.dropDatabase();
 app.use(express.json());
 
 //Set CORS Headers for communication on the same serve
@@ -18,7 +18,7 @@ app.use((req, res, next) => {
     next();
 });
 
-// This is the high-level overview List that mst be kept synchronized at all times!
+// This is the high-level overview List that must be kept synchronized at all times!
 const observedLocations = []
 
 
@@ -46,7 +46,7 @@ smartdirector.apiReq('192.168.5.1', 'admin:FiatLux007', 'subscribe', { }, 443)
     }))
     .on('data', data => {
         const t = data;
-        // Generell idea: 
+        // Generel idea: 
     })
     .on('error', (e => console.log(e)))
     .on('end', (end => console.log(end)));
