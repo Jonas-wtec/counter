@@ -20,8 +20,7 @@ app.use((req, res, next) => {
 
 // This is the high-level overview Set that must be kept synchronized at all times!
 const observedLocations = new Set();
-const observedFixtures = [];
-
+var observedFixtures = [];
 
 smartdirector.apiReq('192.168.5.1', 'admin:FiatLux007', 'subscribe', {}, 443)
     .once('data', (rawClusterData => {
@@ -49,16 +48,20 @@ smartdirector.apiReq('192.168.5.1', 'admin:FiatLux007', 'subscribe', {}, 443)
         const clusterData = JSON.parse(rawClusterData).responseData;
         //console.log(clusterData);
         //General idea: Check if any new motionData is reported in clusterData. If yes, check if that motionData is within our observedFixtures. If yes, add motion to /motions
-        if (!clusterData.hasOwnProperty('fixture') || !clusterData.fixture.some(oneFixture => oneFixture.sensorStats.hasOwnProperty('motion') )) { return; }
+        if (!clusterData.hasOwnProperty('fixture') || !clusterData.fixture.some(oneFixture => oneFixture.sensorStats.hasOwnProperty('motion'))) { return; }
         console.log("Motion update");
         // Check if motionData is within observedFixtures
-        if (clusterData.fixture.some(oneFixture => observedFixtures.some(oFixtures => oneFixture === oFixtures))){
-            console.log("Überschneidung!")
-        }
-
+        if (!clusterData.fixture.some(oneFixture => observedFixtures.some(oFixtures => `/fixture/${oneFixture.serialNum}` === oFixtures))) { return; }
+        console.log("Überschneidung!")
+        clusterData.fixture.forEach(oneFixture => {
+            
+        })
     })
-    .on('error', (e => console.log(e)))
-    .on('end', (end => console.log(end)));
+    .on('error', (e => console.error(e)))
+    .on('end', (end => {
+        console.log(end);
+        // TODO Restart node app.js
+    }));
 
 
 
@@ -93,7 +96,7 @@ app.post('/counts', (req, res) => {
                         console.log("Added location " + req.body.location + " to observed locations");
                         //Add location childFixtures to observedFixtures, if childFixtures exist
                         if (!location.childFixture.length) { return; }
-                        observedFixtures.push(location.childFixture);
+                        observedFixtures = observedFixtures.concat(location.childFixture);
                         console.log("Added childFixtures to observedFixtures " + observedFixtures);
                     })
                     .catch((error) => console.log(error));
