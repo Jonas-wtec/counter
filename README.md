@@ -11,5 +11,4 @@ The project is split into three different sections:
 More information can be found in the respective project folders.
 
 
-![Alt text](./UML.drawio.svg)
-<img src="./UML.drawio.svg">
+![UML Diagram of People Counter](./UML.drawio.svg)
