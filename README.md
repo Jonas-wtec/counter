@@ -9,3 +9,7 @@ The project is split into three different sections:
 - Data-Analysis: Python script, which processes generated location count data into a csv for further progressing
 
 More information can be found in the respective project folders.
+
+
+![Alt text](./UML.drawio.svg)
+<img src="./UML.drawio.svg">
