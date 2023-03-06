@@ -81,7 +81,7 @@ const recursiveEval = (substring, emitter, storage) => {
             JSON.parse(storage.join(''))
             emitter.emit('data', storage.join(''));
         } catch {
-            if (/\r\n\r\n/g.test(substring) || /\r\n/g.test(substring)) { console.log("GOTCHA BITCH") }
+            if (/\r\n\r\n/g.test(substring) || /\r\n/g.test(substring)) { console.log("skip") }
             console.log("Coundn't parse storage in recursive eval... skipping")
         }
         storage.length = 0;
