@@ -18,11 +18,12 @@ export class HttpService{
   allLocations$: ReplaySubject<string[]> = new ReplaySubject<string[]>(1);
 
   constructor(private http: HttpClient) {
-    this.currentCount$.subscribe(newNumber => this.changeCount(newNumber));
-    this.getLocations();
+    //this.currentCount$.subscribe(newNumber => this.changeCount(newNumber));
+    //this.getLocations();
   }
 
   getLocations(): void {
+    return
     this.http.get(this.lUrl).subscribe((res:any) => {
       if (!res.length) {
         this.allLocations$.next([]);
@@ -43,6 +44,7 @@ export class HttpService{
 
 
   reqLocationCount(location: string) {
+    return
     this.location = location;
     this.http.post(this.cUrl, {
       get: "get",
@@ -57,6 +59,7 @@ export class HttpService{
   }
 
   changeCount(number: number) {
+    return
     if (!this.location) { console.error('this.location is undefined!'); return }
     this.http.post(this.cUrl, { count: number, location: this.location })
       .subscribe((res: any) => {

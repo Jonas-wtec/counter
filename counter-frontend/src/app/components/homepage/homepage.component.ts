@@ -3,6 +3,7 @@ import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { HttpService } from 'src/app/services/http.service';
 import { ChangeLocationComponent } from '../change-location/change-location.component';
+import { DemoBannerComponent } from '../demo/demo-banner/demo-banner.component';
 
 @Component({
   selector: 'app-homepage',
@@ -19,19 +20,24 @@ export class HomepageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const x = localStorage.getItem("currentLocation")
-    if (x) {
-      this.currentLocation = x;
-      this.http.reqLocationCount(x);
-    } else {
-      this.openDialog();
-    }
+
+    const dialogRef = this.dialog.open(DemoBannerComponent);
+
+    dialogRef.afterClosed().subscribe((result: FormControl | undefined) => {
+      const x = localStorage.getItem("currentLocation")
+      if (x) {
+        this.currentLocation = x;
+        this.http.reqLocationCount(x);
+      } else {
+        this.openDialog();
+      }
+    });
   }
   openDialog(): void {
     const dialogRef = this.dialog.open(ChangeLocationComponent);
 
     dialogRef.afterClosed().subscribe((result: FormControl | undefined) => {
-      if (!result) {return}
+      if (!result) { return }
       console.log(`Dialog result: ${result}`);
       if (!result.value || typeof result.value !== "string") { return }
       localStorage.setItem("currentLocation", result.value);
@@ -40,12 +46,12 @@ export class HomepageComponent implements OnInit {
     });
   }
 
-  addCount(){
-    this.currentCount$.next(this.currentCount$.getValue()+1);
+  addCount() {
+    this.currentCount$.next(this.currentCount$.getValue() + 1);
   }
 
-  removeCount(){
-    if(this.currentCount$.getValue() === 0) {return}
+  removeCount() {
+    if (this.currentCount$.getValue() === 0) { return }
     this.currentCount$.next(this.currentCount$.getValue() - 1);
   }
 
